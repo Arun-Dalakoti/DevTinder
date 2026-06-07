@@ -1,0 +1,20 @@
+{
+  "name": "devtinder-backend",
+  "version": "1.0.0",
+  "description": "Backend service for DevTinder - a Tinder-like developer networking platform. Built with Node.js, Express.js, and MongoDB. Features RESTful APIs for authentication, profile management, connection request lifecycle (interested/ignored/accepted/rejected) and developer feed discovery.",
+  "keywords": [
+    "nodejs",
+    "javascript"
+  ],
+  "license": "ISC",
+  "author": "Arun Dalakoti",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
