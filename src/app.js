@@ -7,6 +7,58 @@ const PORT = 3000;
 
 app.use(express.json());
 
+app.get("/user", async (req, res) => {
+  try {
+    const user = await User.findOne({ emailId: req.body.email });
+
+    if (!user) {
+      res.status(404).send("User not found");
+    } else {
+      res.send(user);
+    }
+  } catch (error) {
+    res.status(400).send("Something went wrong while fetching user details...");
+  }
+});
+
+app.delete("/user", (req, res) => {
+  try {
+    const userId = req.body.userId;
+
+    const user = User.findByIdAndDelete(userId);
+
+    res.send("User deleted successfully");
+  } catch (error) {
+    res.status(400).send("Something went wrong while deleting the user...");
+  }
+});
+
+app.patch("/user", async (req, res) => {
+  try {
+    const body = req.body;
+    const userId = body.userId;
+
+    const user = await User.findByIdAndUpdate({ _id: userId }, body, {
+      returnDocument: "before",
+      runValidators: true,
+    });
+    res.send("User updated successfully");
+  } catch (error) {
+    res.status(400).send("Something went wrong while updating the user...");
+  }
+});
+
+app.get("/feed", async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.send(users);
+  } catch (error) {
+    res
+      .status(400)
+      .send("Something went wrong while fetching all the users...");
+  }
+});
+
 app.post("/signup", async (req, res) => {
   const user = new User({
     firstName: "Arun",
