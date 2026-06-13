@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
+const validator = require("validator");
 
 const userSchema = new Schema(
   {
@@ -20,11 +21,21 @@ const userSchema = new Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid email address: " + value);
+        }
+      },
     },
 
     password: {
       type: String,
       required: true,
+      validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error("Enter a strong password" + value);
+        }
+      },
     },
 
     age: {
@@ -44,6 +55,11 @@ const userSchema = new Schema(
     photoUrl: {
       type: String,
       default: "https://img.icons8.com/nolan/1200/user-default.jpg",
+      validete(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Invalid Photo URL: " + value);
+        }
+      },
     },
 
     about: {
