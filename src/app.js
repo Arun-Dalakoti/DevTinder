@@ -1,11 +1,17 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/user");
+const { validateSignUpData } = require("./utils/validation");
+const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middleware/auth");
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+app.use(cookieParser())
 
 app.get("/user", async (req, res) => {
   try {
@@ -68,23 +74,72 @@ app.get("/feed", async (req, res) => {
   } catch (error) {
     res
       .status(400)
-      .send("Something went wrong while fetching all the users...");
+      .send(
+        "Something went wrong while fetching all the users..." + error.message,
+      );
   }
 });
 
-app.post("/signup", async (req, res) => {
-  const user = new User({
-    firstName: "Arun",
-    lastName: "Dalakoti",
-    emailId: "test@gmail.com",
-    password: "password",
-  });
-
+app.post("/login", (req, res) => {
   try {
-    await user.save();
-    res.send("User saved successfully");
+    const { emailId, password } = req.body;
+
+    const user = await User.findOne({emailId: emailId});
+
+    if(!user){
+      throw new Error("Invalid Credentials")
+    }
+
+    const isPasswordValid = await user.validatePassword(password)
+
+    if(isPasswordValid){
+
+      const token = await user.getJWT()
+
+      res.cookie("token",token, {expires: new Date(Date.now() + 8 * 3600000)})
+
+      res.send("Login Successfull!!!")
+    }else {
+      throw new Error("Invalid Credentials")
+    }
   } catch (error) {
-    res.status(400).send("Error saving the user: " + error.message);
+    res
+      .status(400)
+      .send("Something went while fetching the user..." + +error.message);
+  }
+});
+
+app.get("/profile", userAuth ,(req,res) => {
+  try {
+    const user = req.user;
+    
+    res.send(user);
+  } catch (error) {
+    res.status(400).send("Error getting the user: " + error.message);
+  }
+  
+})
+
+app.post("/signup", async (req, res) => {
+  try {
+    // validation of data
+    validateSignUpData(req);
+
+    // Encrypt the password.
+    const { password, firstName, lastName, emailId, password } = req.body;
+
+    const passwordHash = bcrypt.hash(password, 10); // saltrounds = 10
+
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: passwordHash,
+    });
+    await user.save();
+    res.send("User added successfully");
+  } catch (error) {
+    res.status(400).send("Error adding the user: " + error.message);
   }
 });
 
