@@ -47,11 +47,17 @@ const userSchema = new Schema(
 
     gender: {
       type: String,
-      validate(value) {
-        if (!["male", "female", "others"].includes(value)) {
-          throw new Error("Gender data is not valid");
-        }
+
+      //using enum instead of validator. Both works in the same way
+      enum: {
+        values: ["male", "female", "others"],
+        message: `{VALUE} is not a valid gender type`,
       },
+      //   validate(value) {
+      //     if (!["male", "female", "others"].includes(value)) {
+      //       throw new Error("Gender data is not valid");
+      //     }
+      //   },
     },
 
     photoUrl: {
