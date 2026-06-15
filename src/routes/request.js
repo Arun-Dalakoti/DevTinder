@@ -54,4 +54,50 @@ router.post("/request/send/:status/:toUserId", userAuth, async (req, res) => {
   }
 });
 
+router.post(
+  "/request/review/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedInUser = req.user;
+
+      const { status, requestId } = req.params;
+
+      // Validate the status
+      const allowedStatus = ["accepted", "rejected"];
+
+      if (!allowedStatus.includes(status)) {
+        return res
+          .status(400)
+          .json({ message: "Invalid status type" + status });
+      }
+
+      // only the toUserid person can accept a request. Also we need to check if this toUserId person is loggedin(currently loggedin user)
+      //if request is in ignored state then no one can change it. So status should be interested.
+
+      const connectionRequest = await ConnectionRequest.findOne({
+        _id: requestId,
+        toUserId: loggedInUser._id,
+        status: "interested", // only request with "interested" as state allowed.
+      });
+
+      if (!connectionRequest) {
+        return res
+          .status(404)
+          .json({ message: "Connection request not found" });
+      }
+
+      connectionRequest.status = status;
+      const data = await connectionRequest.save();
+
+      res.json({
+        message: "Connection request" + status,
+        data,
+      });
+    } catch (error) {
+      res.status(400).send("Error:" + error.message);
+    }
+  },
+);
+
 module.exports = router;
