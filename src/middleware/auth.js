@@ -6,7 +6,7 @@ const userAuth = (req, res, next) => {
         const {token} = res.cookies;
 
         if(!token){
-            throw new Error("Invalid Token")
+            return res.status(401).send("Please login")
         }
 
         //todo: add secret key in env = "DEV@Tinder$7"

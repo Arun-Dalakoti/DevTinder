@@ -49,4 +49,18 @@ userRouter.get("/user/connections", userAuth, (req, res) => {
   }
 });
 
+userRouter.get("/feed", userAuth, (req, res) => {
+  try {
+    //User should see all the user cards except ->
+    // 1)- His own card
+    // 2)- his connections
+    // 3)- ignored people
+    // 4)- already sent connection requests.
+
+    const loggedInUser = req.user;
+  } catch (error) {
+    res.status(400).send("Error:" + error.message);
+  }
+});
+
 module.exports = userRouter;

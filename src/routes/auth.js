@@ -47,7 +47,7 @@ router.post("/login", (req, res) => {
 
       res.cookie("token",token, {expires: new Date(Date.now() + 8 * 3600000)})
 
-      res.send("Login Successfull!!!")
+      res.json({message:"Login Successfull!!!",data: user})
     }else {
       throw new Error("Invalid Credentials")
     }
