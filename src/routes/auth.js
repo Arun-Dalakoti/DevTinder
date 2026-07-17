@@ -1,7 +1,7 @@
 const express = require("express");
 const { validateSignUpData } = require("../utils/validation");
 const User = require("../models/user");
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
 
 const router = express.Router();
 
@@ -28,28 +28,28 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { emailId, password } = req.body;
 
-    const user = await User.findOne({emailId: emailId});
+    const user = await User.findOne({ emailId: emailId });
 
-    if(!user){
-      throw new Error("Invalid Credentials")
+    if (!user) {
+      throw new Error("Invalid Credentials");
     }
 
-    const isPasswordValid = await user.validatePassword(password)
+    const isPasswordValid = await user.validatePassword(password);
 
-    if(isPasswordValid){
+    if (isPasswordValid) {
+      const token = await user.getJWT();
 
-      const token = await user.getJWT()
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 8 * 3600000),
+      });
 
-      res.cookie("token",token, {expires: new Date(Date.now() + 8 * 3600000)})
-
-      res.json({message:"Login Successfull!!!",data: user})
-    }else {
-      throw new Error("Invalid Credentials")
+      res.json({ message: "Login Successfull!!!", data: user });
+    } else {
+      throw new Error("Invalid Credentials");
     }
   } catch (error) {
     res
@@ -58,11 +58,10 @@ router.post("/login", (req, res) => {
   }
 });
 
-router.post("logout",(req,res) => {
+router.post("logout", (req, res) => {
   res
-    .cookie("token", null, {expires: new Date(Date.now())})
+    .cookie("token", null, { expires: new Date(Date.now()) })
     .send("Logout successful");
-})
+});
 
-
-module.exports = authRouter;
+module.exports = router;
