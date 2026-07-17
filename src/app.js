@@ -32,4 +32,4 @@ connectDB()
       console.log(`Server is successfully listening on port ${PORT}`);
     });
   })
-  .catch(() => console.log("DB not connected"));
+  .catch((err) => console.log("DB not connected", err));
