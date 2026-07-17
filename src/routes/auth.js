@@ -11,7 +11,7 @@ router.post("/signup", async (req, res) => {
     validateSignUpData(req);
 
     // Encrypt the password.
-    const { password, firstName, lastName, emailId, password } = req.body;
+    const { password, firstName, lastName, emailId } = req.body;
 
     const passwordHash = bcrypt.hash(password, 10); // saltrounds = 10
 
