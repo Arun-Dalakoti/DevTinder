@@ -87,8 +87,7 @@ const userSchema = new Schema(
 userSchema.methods.getJWT = async function () {
   const user = this;
 
-  //todo: add secret key in env = "DEV@Tinder$7"
-  const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$7", {
+  const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 

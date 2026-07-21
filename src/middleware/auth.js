@@ -9,8 +9,7 @@ const userAuth = async (req, res, next) => {
       return res.status(401).send("Please login");
     }
 
-    //todo: add secret key in env = "DEV@Tinder$7"
-    const decodedObj = await jwt.verify(token, "DEV@Tinder$7");
+    const decodedObj = await jwt.verify(token, process.env.JWT_SECRET);
 
     const { _id } = decodedObj;
 
